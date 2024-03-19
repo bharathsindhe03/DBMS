@@ -9,7 +9,8 @@ create table employee(
 	salary int,
 	superssn int,
 	dno int,
-	constraint pk1 primary key(ssn)
+	constraint pk1 primary key(ssn),
+	constraint fk3 foreign key(superssn) references employee(ssn)
 );
 
 create table department(
@@ -23,7 +24,6 @@ create table department(
 
 
 alter table employee add constraint fk2 foreign key(dno) references department(dno);
-alter table employee add constraint fk3 foreign key(superssn) references employee(ssn);
 
 create table dlocation(
 	dno int,
@@ -111,7 +111,16 @@ from employee e,department d
 where e.dno = d.dno and d.dname = "accounts";
 
 #q4
+SELECT E.NAME, E.LNAME
+FROM EMPLOYEE E
+WHERE NOT EXISTS((SELECT PNO
+FROM PROJECT
+WHERE DNO='')
+EXCEPT(SELECT PNO
+FROM WORKON
+WHERE E.SSN=SSN));
 
+#q5
 select d.dno,count(*)
 from employee e,department d
 where d.dno and e.salary > 600000 and d.dno in (select dno 
