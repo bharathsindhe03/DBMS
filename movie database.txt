@@ -11,7 +11,7 @@ create table director(
 );
 
 create table movies(
-	moiveid int primary key,
+	movieid int primary key,
 	title varchar(20),
 	year int,
 	lang varchar(20),
@@ -25,14 +25,14 @@ create table moviecast(
 	role varchar(20),
 	primary key(actid,movieid),
 	constraint fk2 foreign key(actid) references actor(actid),
-	constraint fk3 foreign key(movieid) references movies(moiveid)
+	constraint fk3 foreign key(movieid) references movies(movieid)
 );
 
 create table rating(
 	movieid int,
 	revstar int,
 	primary key(movieid,revstar),
-	constraint fk4 foreign key(movieid) references movies(moiveid)
+	constraint fk4 foreign key(movieid) references movies(movieid)
 );
 
 
@@ -54,10 +54,10 @@ insert into director values
 
 insert into movies values
 (1000,"kgf",2019,"kannada",100),
-(1001,"bahubali",2019,"kannada",100),
-(1002,"animal",2019,"hindi",105),
-(1003,"war",2019,"hindi",103),
-(1004,"ranna",2019,"kannada",104);
+(1001,"bahubali",2018,"kannada",100),
+(1002,"animal",2023,"hindi",105),
+(1003,"war",1990,"hindi",103),
+(1004,"ranna",2013,"kannada",104);
 
 
 insert into moviecast values
@@ -86,7 +86,7 @@ where d.dirid = m.dirid and d.dirname = "hitchock";
 2.
 select m.title
 from movies m,moviecast mc
-where m.moiveid = mc.movieid and mc.actid in 
+where m.movieid = mc.movieid and mc.actid in 
 			( select actid 
 			  from moviecast
 		   	   group by actid
@@ -95,22 +95,16 @@ group by title
 having count(*)>1;
 
 3.
-select distinct(actname)
-from actor a,moviecast mc,movies m
-join moviecast  on a.actid = mc.actid
-join movies  on m.moiveid = mc.movieid
-where m.year >= 2015
-intersect 
-select distinct(actname)
-from actor a,moviecast mc,movies m
-join moviecast  on a.actid = mc.actid
-join movies  on m.moiveid = mc.movieid
-where m.year <= 2000;
+select actname
+from actor a
+join moviecast  mc on a.actid = mc.actid
+join movies  m on m.movieid = mc.movieid
+where m.year not between 2000 and 2015;
 
 4.
 select m.title, max(r.revstar) as max_revstar
 from movies m
-inner join rating r on m.moiveid = r.movieid
+inner join rating r on m.movieid = r.movieid
 group by m.title
 having max(r.revstar) > 0
 order by m.title;
@@ -119,7 +113,7 @@ order by m.title;
 update rating 
 set revstar = 5
 where movieid in ( 
-    select m.moiveid
+    select m.movieid
     from movies m
     join director d on m.dirid = d.dirid
     where d.dirname = 'steven'
