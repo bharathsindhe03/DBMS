@@ -1,3 +1,26 @@
+Aim: Introduce concepts of PLSQL and usage on the table. 
+ 
+Program: Consider the schema for College Database: 
+STUDENT(USN, SName, Address, Phone, Gender) 
+SEMSEC(SSID, Sem, Sec) 
+CLASS(USN, SSID) 
+COURSE(Subcode, Title, Sem, Credits) 
+IAMARKS(USN, Subcode, SSID, Test1, Test2, Test3, FinalIA) 
+  Write SQL queries to 
+       1. List all the student details studying in fourth semester ‘C’ section. 
+       2. Compute the total number of male and female students in each semester and in each 
+section. 
+       3. Create a view of Test1 marks of student USN ‘1BI15CS101’ in all Courses. 
+       4. Calculate the FinalIA (average of best two test marks) and update the corresponding table 
+for all students. 
+       5. Categorize students based on the following criterion: 
+            If FinalIA = 17 to 20 then CAT = ‘Outstanding’ 
+            If FinalIA = 12 to 16 then CAT = ‘Average’ 
+            If FinalIA< 12 then CAT = ‘Weak’ 
+Give these details only for 8th semester A, B, and C section students.
+
+#create
+
 create table student(
 	usn varchar(20) primary key,
 	sname varchar(20),
@@ -41,6 +64,7 @@ create table IAMarks(
 	constraint fk5 foreign key(ssid) references semsec(ssid)
 );
 	
+#insert
 
 insert into student values
 ("1RN21CS049","Dhanush M","Bangalore",829616,"male"),
@@ -90,20 +114,20 @@ insert into iamarks values
 ("1RN21CS049","21CS52","CSE5A",17,18,19,NULL),
 ("1RN21CS049","21CS53","CSE5A",12,13,14,NULL);
 
-1.
+#q1
 select s.usn,sname,address,phone,sem,sec
 from student s,semsec ss,class c
 where c.usn=s.usn and ss.ssid=c.ssid and ss.sem=4
 and ss.sec='A';
 
-2.
+#q2
 select ss.sem,ss.sec,s.gender,count(s.gender) as count
 from semsec ss ,class c,student s
 where c.usn=s.usn and c.ssid=ss.ssid
 group by ss.sem,ss.sec,s.gender
 order by sem;
 
-3.
+#q3
 create view 1rn21cs049test1 as
 select test1,subcode
 from iamarks
@@ -111,14 +135,14 @@ where usn="1RN21CS049";
 
 select * from 1rn21cs049test1;
 
-4.
+#q4
 update iamarks 
 set finalIA=(test1+test2+test3-least(test1,test2,test3))/2
 where usn is not NULL;
 
 select * from iamarks;
 
-5.
+#q5
 select m.usn,m.subcode,m.finalIA,
 	case 
 		when(finalIA<=20 and finalIA>=17) then 'outstanding'
